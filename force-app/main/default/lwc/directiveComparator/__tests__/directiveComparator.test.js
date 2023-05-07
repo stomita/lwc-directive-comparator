@@ -36,7 +36,6 @@ describe("c-directive-comparator", () => {
     }
   ];
 
-
   it("check comparator works correctly", () => {
     const context = {
       contactId: "cont1",
@@ -49,22 +48,30 @@ describe("c-directive-comparator", () => {
         );
       }
     };
-    const $ = comparator(context, {
-      contactId: STRING_VALUE,
-      keyword: STRING_VALUE,
-      account: {
-        Id: STRING_VALUE
-      },
-      contacts: [
-        {
-          Id: STRING_VALUE,
-          Account: {
-            Id: STRING_VALUE
+    const $ = comparator(
+      context,
+      {
+        contactId: STRING_VALUE,
+        keyword: STRING_VALUE,
+        account: {
+          Id: STRING_VALUE
+        },
+        contacts: [
+          {
+            Id: STRING_VALUE,
+            Account: {
+              Id: STRING_VALUE
+            }
           }
+        ],
+        filteredContacts: []
+      },
+      {
+        constants: {
+          three: 3
         }
-      ],
-      filteredContacts: []
-    });
+      }
+    );
     expect($.contacts.length.gt.zero).toBe(true);
     expect($.filteredContacts.length.gt.zero).toBe(true);
     expect($.account.Name.includes.$keyword).toBe(true);
@@ -80,6 +87,7 @@ describe("c-directive-comparator", () => {
     context.contactId = "cont2";
     context.keyword = "Ad";
     expect($.account.Name.not.includes.$keyword).toBe(true);
+    expect($.keyword.length.lte.three).toBe(true);
     expect($.filteredContacts.isEmpty).toBe(true);
     for (const [index, contact] of [...$.contacts].entries()) {
       expect(
