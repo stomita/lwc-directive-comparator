@@ -3,43 +3,46 @@ import { comparator, STRING_VALUE } from "c/directiveComparator";
 describe("c-directive-comparator", () => {
   afterEach(() => {});
 
+  const ACCOUNT1 = {
+    Id: "acct1",
+    Name: "Acme Corporation"
+  };
+
+  const CONTACTS = [
+    {
+      Id: "cont1",
+      Name: "Amy Taylor",
+      Title: "VP of Engineering",
+      Account: ACCOUNT1
+    },
+    {
+      Id: "cont2",
+      Name: "Michael Jones",
+      Title: "VP of Sales",
+      Account: ACCOUNT1
+    },
+    { Id: "cont3", Name: "Jennifer Wu", Title: "CEO", Account: ACCOUNT1 },
+    {
+      Id: "cont4",
+      Name: "John Doe",
+      Title: "VP of Engineering",
+      Account: ACCOUNT1
+    },
+    {
+      Id: "cont5",
+      Name: "Jane Doe",
+      Title: "VP of Sales",
+      Account: ACCOUNT1
+    }
+  ];
+
+
   it("check comparator works correctly", () => {
-    const account1 = {
-      Id: "acct1",
-      Name: "Acme Corporation"
-    };
     const context = {
       contactId: "cont1",
       keyword: "or",
-      account: account1,
-      accountId: account1.Id,
-      contacts: [
-        {
-          Id: "cont1",
-          Name: "Amy Taylor",
-          Title: "VP of Engineering",
-          Account: account1
-        },
-        {
-          Id: "cont2",
-          Name: "Michael Jones",
-          Title: "VP of Sales",
-          Account: account1
-        },
-        { Id: "cont3", Name: "Jennifer Wu", Title: "CEO", Account: account1 },
-        {
-          Id: "cont4",
-          Name: "John Doe",
-          Title: "VP of Engineering",
-          Account: account1
-        },
-        {
-          Id: "cont5",
-          Name: "Jane Doe",
-          Title: "VP of Sales",
-          Account: account1
-        }
-      ],
+      account: ACCOUNT1,
+      contacts: CONTACTS,
       get filteredContacts() {
         return this.contacts.filter((contact) =>
           contact.Name.toLowerCase().includes(this.keyword.toLowerCase())
@@ -74,7 +77,7 @@ describe("c-directive-comparator", () => {
       expect(contact.$.Account.Id.equals.$account.Id).toBe(true);
     }
     // mutate context property value
-    context.contactId = "2";
+    context.contactId = "cont2";
     context.keyword = "Ad";
     expect($.account.Name.not.includes.$keyword).toBe(true);
     expect($.filteredContacts.isEmpty).toBe(true);
