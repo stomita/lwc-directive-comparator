@@ -129,6 +129,19 @@ function estimateTypeDef(value) {
 /**
  *
  */
+function toArray(value) {
+  if (value == null) {
+    return value;
+  }
+  if (typeof value[Symbol.iterator] === "function") {
+    return Array.from(value);
+  }
+  return [value];
+}
+
+/**
+ *
+ */
 function createMemo(getKeyValue) {
   let lastKeyValue;
   let memoResult;
@@ -188,31 +201,32 @@ function createIteratorComparator(items, itemType, options) {
     { length: NUMBER_VALUE },
     { ...options, estimateProps: false }
   );
-  const iter = {
-    index: 0,
-    next() {
-      const itemOptions = {
-        ...options,
-        contextProperty: `${this.index}`,
-        contextPath: `${options.contextPath}[${this.index}]`,
-        estimateProps: true
-      };
-      const done = this.index >= (items?.length ?? 0);
-      const item = done ? undefined : items?.[this.index++];
-      const value = item
-        ? {
-            ...item,
-            [options.comparatorNamespace]: createComparator(
-              item,
-              itemType,
-              itemOptions
-            )
-          }
-        : undefined;
-      return { done, value };
-    }
+  const iterItems = toArray(items)?.map((item, index) => {
+    const itemOptions = {
+      ...options,
+      contextProperty: `${index}`,
+      contextPath: `${options.contextPath}[${index}]`,
+      estimateProps: true
+    };
+    return {
+      ...item,
+      [options.comparatorNamespace]: createComparator(
+        item,
+        itemType,
+        itemOptions
+      )
+    };
+  });
+  comp[Symbol.iterator] = () => {
+    let index = 0;
+    return {
+      next() {
+        const done = index >= (iterItems?.length ?? 0);
+        const value = done ? undefined : iterItems?.[index++];
+        return { done, value };
+      }
+    };
   };
-  comp[Symbol.iterator] = () => iter;
   return comp;
 }
 
@@ -220,8 +234,7 @@ function createIteratorComparator(items, itemType, options) {
  *
  */
 function createComparisonOperand(satisfies, valueDef, options) {
-  const valueDefs =
-    valueDef == null ? [] : Array.isArray(valueDef) ? valueDef : [valueDef];
+  const valueDefs = valueDef == null ? [] : toArray(valueDef);
   const additionalValues = valueDefs.filter(
     (value) => !VALUE_SYMBOLS.has(value)
   );
