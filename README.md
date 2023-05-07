@@ -145,7 +145,7 @@ export default class DirectiveComparatorSimpleExample extends LightningElement {
 }
 ```
 
-The template markup goes like this without any getters in the class.
+The template markup goes like this. Note that it does not have any getters in the class.
 
 ```html
 <template>
@@ -164,7 +164,7 @@ The template markup goes like this without any getters in the class.
 ```
 
 You can do the comparison in iterations, too.
-Each iteration element have comparator properties that 
+Each iteration element has a comparator property to form a comparison expression.
 
 ```javascript
 import { LightningElement } from 'lwc';
