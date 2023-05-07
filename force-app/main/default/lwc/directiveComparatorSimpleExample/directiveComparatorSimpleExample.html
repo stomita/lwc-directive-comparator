@@ -1,0 +1,13 @@
+<template>
+  <div>
+    <template lwc:if={$.rank.is.gold}>
+      <span>Hi, {fullName}, special offer to you, click <a href="">here</a>.</span>
+    </template>
+    <template lwc:if={$.rank.is.silver}>
+      <span>Hi, {fullName}, thanks for visiting again !</span>
+    </template>
+    <template lwc:if={$.rank.is.bronze}>
+      <span>Welcome, {fullName}</span>
+    </template>
+  </div>
+</template>

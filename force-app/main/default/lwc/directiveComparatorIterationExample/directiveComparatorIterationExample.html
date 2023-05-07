@@ -1,0 +1,36 @@
+<template>
+  <div>
+    <template for:each={$.customers} for:item="customer">
+      <div class="customer-info" key={customer.id}>
+        <span class="icon">
+          <template lwc:if={customer.$.rank.equals.gold}>
+            <lightning-icon
+              icon-name="standard:reward"
+              size="medium"
+            ></lightning-icon>
+          </template>
+          <template lwc:if={customer.$.rank.equals.silver}>
+            <lightning-icon
+              icon-name="standard:promotions"
+              size="small"
+            ></lightning-icon>
+          </template>
+          <template lwc:if={customer.$.rank.equals.bronze}>
+            <lightning-icon
+              icon-name="standard:customer"
+              size="x-small"
+            ></lightning-icon>
+          </template>
+        </span>
+        <span class="name">
+          <template lwc:if={customer.$.id.equals.$customerId}>
+            <strong>** {customer.fullName} **</strong>
+          </template>
+          <template lwc:else>
+            <span>{customer.fullName}</span>
+          </template>
+        </span>
+      </div>
+    </template>
+  </div>
+</template>

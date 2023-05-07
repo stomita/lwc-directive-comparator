@@ -1,0 +1,34 @@
+<template>
+  <div>
+    <div>
+      <lightning-input
+        placeholder="Input Search Keyword"
+        onchange={handleChangeKeywordInput}
+        onkeydown={handleKeydownKeywordInput}
+      ></lightning-input>
+      <template lwc:if={$.keywordInput.length.gt.five}>
+        <div style="color: red">Inputing more than 5 chars in keyword</div>
+      </template>
+    </div>
+    <template lwc:if={$.contacts.data.isNullish}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="medium"
+      ></lightning-spinner>
+    </template>
+    <template lwc:elseif={$.contacts.data.length.equals.zero}>
+      <div>(No matching contacts found)</div>
+    </template>
+    <template for:each={$.contacts.data} for:item="contact">
+      <li key={contact.Id}>
+        <a data-id={contact.Id} onclick={handleClickContact}>
+          <template lwc:if={contact.$.Id.equals.$contactId}>
+            <strong>[{contact.Name}]</strong>
+          </template>
+          <template lwc:else>{contact.Name}</template>
+        </a>
+        ({contact.Email})
+      </li>
+    </template>
+  </div>
+</template>
