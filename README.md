@@ -83,10 +83,10 @@ export default class MyComponent2 extends LightningElement {
   get customers() {
     return this.customers_.map((customer) => ({
       ...customer,
-      selected: customer.id === this.customerId,
-      isGold: customer.rank === 'gold',
-      isSilver: customer.rank === 'silver',
-      isBronze: customer.rank === 'bronze',
+      isSelected: customer.id === this.customerId,
+      isGoldRank: customer.rank === 'gold',
+      isSilverRank: customer.rank === 'silver',
+      isBronzeRank: customer.rank === 'bronze',
     });
   }
 }
@@ -98,18 +98,18 @@ export default class MyComponent2 extends LightningElement {
     <template for:each={customers} for:item="customer">
       <div class="customer-info" key={customer.id}>
         <span class="icon">
-          <template lwc:if={isGold}>
+          <template lwc:if={customer.isGoldRank}>
             <lightning-icon icon-name="standard:reward" size="medium"></lightning-icon>
           </template>
-          <template lwc:if={isSilver}>
+          <template lwc:if={customer.isSilverRank}>
             <lightning-icon icon-name="standard:promotions" size="small"></lightning-icon>
           </template>
-          <template lwc:if={isBronze}>
+          <template lwc:if={customer.isBronzeRank}>
             <lightning-icon icon-name="standard:customer" size="x-small"></lightning-icon>
           </template>
         </span>
         <span class="name">
-          <template lwc:if={customer.selected}>
+          <template lwc:if={customer.isSelected}>
             <strong>** {customer.fullName} **</strong>
           </template>
           <template lwc:else>
