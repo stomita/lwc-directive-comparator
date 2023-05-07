@@ -57,6 +57,8 @@ const UNARY_COMPARISON_OPERATIONS = {
   isFalsy: (v) => !v,
   isNull: (v) => v === null,
   isNotNull: (v) => v !== null,
+  isUndefined: (v) => typeof v === "undefined",
+  isNotUndefined: (v) => typeof v !== "undefined",
   isNullish: (v) => v == null,
   isNotNullish: (v) => v != null,
   isEmpty: (v) => v == null || v === "" || (Array.isArray(v) && v.length === 0),
@@ -67,14 +69,14 @@ const UNARY_COMPARISON_OPERATIONS = {
 /**
  *
  */
-const DEFAULT_COMPARISON_NAME_VALUE_PAIRS = [
-  ["zero", 0],
-  ["one", 1],
-  ["true", true],
-  ["false", false],
-  ["null", null],
-  ["undefined", undefined]
-];
+const DEFAULT_COMPARISON_CONSTANTS = {
+  zero: 0,
+  one: 1,
+  true: true,
+  false: false,
+  null: null,
+  undefined: undefined
+};
 
 function isObjectTypeDefinition(typeDef) {
   return (
@@ -139,6 +141,21 @@ function toArray(value) {
   return [value];
 }
 
+function toNameValuePairs(values) {
+  const nameValuePairs = [];
+  for (const val of values) {
+    if (typeof val === "object" && val != null) {
+      for (const [name, value] of Object.entries(val)) {
+        nameValuePairs.push([name, value]);
+      }
+    } else {
+      const [name, value] = toArray(val).slice(0, 1);
+      nameValuePairs.push([name, value]);
+    }
+  }
+  return nameValuePairs;
+}
+
 /**
  *
  */
@@ -170,24 +187,17 @@ function createComparator(context, contextType, options = {}) {
     : ANY_VALUE;
   contextType = contextType === ANY_VALUE ? estimatedContextType : contextType;
   if (isObjectTypeDefinition(contextType)) {
-    const objType = {
+    const propTypes = {
       ...estimatedContextType,
       ...contextType
     };
-    for (const [property, propType] of Object.entries(objType)) {
-      const propOptions = {
-        ...options,
-        contextProperty: `${property}`,
-        contextPath: `${options.contextPath}.${property}`,
-        estimateProps: true
-      };
-      const memo = createMemo(() => context?.[property]);
-      definePropertyComparator(comp, property, memo, propType, propOptions);
-    }
-  } else {
-    defineBinaryComparisonOperations(comp, contextType, options);
+    definePropertyComparators(comp, context, propTypes, options);
   }
-  defineUnaryComparisonOperations(comp, contextType, options);
+  if (contextType === STRING_VALUE) {
+    definePropertyComparators(comp, context, { length: NUMBER_VALUE }, options);
+  }
+  defineBinaryComparisonOperations(comp, contextType, options);
+  defineUnaryComparisonOperations(comp, options);
   return comp;
 }
 
@@ -234,19 +244,20 @@ function createIteratorComparator(items, itemType, options) {
  *
  */
 function createComparisonOperand(satisfies, valueDef, options) {
-  const valueDefs = valueDef == null ? [] : toArray(valueDef);
+  const valueDefs = toArray(valueDef ?? []);
   const additionalValues = valueDefs.filter(
     (value) => !VALUE_SYMBOLS.has(value)
   );
-  const additionalNameValuePairs = additionalValues.map((value) =>
-    Array.isArray(value) ? value : [String(value), value]
-  );
-  const nameValuePairs = [
-    ...DEFAULT_COMPARISON_NAME_VALUE_PAIRS,
-    ...additionalNameValuePairs
-  ];
+  const nameValuePairs = toNameValuePairs([
+    ...additionalValues,
+    ...toArray(options.constants ?? []),
+    DEFAULT_COMPARISON_CONSTANTS
+  ]);
   const vals = {};
   for (const [name, value] of nameValuePairs) {
+    if (name in vals) {
+      continue;
+    }
     Object.defineProperty(vals, name, {
       get() {
         return satisfies(value, name);
@@ -264,23 +275,33 @@ function createComparisonOperand(satisfies, valueDef, options) {
 /**
  *
  */
-function definePropertyComparator(obj, property, memo, propDef, options) {
-  if (property in obj) {
-    return;
-  }
-  let propertyComparator;
-  if (isArrayTypeDefinition(propDef)) {
-    const itemDef = propDef?.[0] ?? ANY_VALUE;
-    propertyComparator = (value) =>
-      createIteratorComparator(value, itemDef, options);
-  } else {
-    propertyComparator = (value) => createComparator(value, propDef, options);
-  }
-  Object.defineProperty(obj, property, {
-    get() {
-      return memo(propertyComparator);
+function definePropertyComparators(obj, context, propTypes, options) {
+  for (const [property, propType] of Object.entries(propTypes)) {
+    if (property in obj) {
+      continue;
     }
-  });
+    const propOptions = {
+      ...options,
+      contextProperty: `${property}`,
+      contextPath: `${options.contextPath}.${property}`,
+      estimateProps: true
+    };
+    const memo = createMemo(() => context?.[property]);
+    let createPropertyComparator;
+    if (isArrayTypeDefinition(propType)) {
+      const itemType = propType?.[0] ?? ANY_VALUE;
+      createPropertyComparator = (value) =>
+        createIteratorComparator(value, itemType, propOptions);
+    } else {
+      createPropertyComparator = (value) =>
+        createComparator(value, propType, propOptions);
+    }
+    Object.defineProperty(obj, property, {
+      get() {
+        return memo(createPropertyComparator);
+      }
+    });
+  }
 }
 
 /**
