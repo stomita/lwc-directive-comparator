@@ -135,7 +135,7 @@ function toArray(value) {
   if (value == null) {
     return value;
   }
-  if (typeof value[Symbol.iterator] === "function") {
+  if (typeof value === 'object' && typeof value[Symbol.iterator] === "function") {
     return Array.from(value);
   }
   return [value];
@@ -149,8 +149,8 @@ function toNameValuePairs(values) {
         nameValuePairs.push([name, value]);
       }
     } else {
-      const [name, value] = toArray(val).slice(0, 1);
-      nameValuePairs.push([name, value]);
+      const [name, value] = toArray(val);
+      nameValuePairs.push([name, value ?? name]);
     }
   }
   return nameValuePairs;
