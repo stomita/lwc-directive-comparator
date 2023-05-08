@@ -88,7 +88,8 @@ function isArrayTypeDefinition(typeDef) {
   return (
     Array.isArray(typeDef) &&
     (typeDef.length === 0 ||
-      (typeDef.length === 1 && isObjectTypeDefinition(typeDef[0])))
+      (typeDef.length === 1 &&
+        (isObjectTypeDefinition(typeDef[0]) || VALUE_SYMBOLS.has(typeDef[0]))))
   );
 }
 
@@ -135,10 +136,36 @@ function toArray(value) {
   if (value == null) {
     return value;
   }
-  if (typeof value === 'object' && typeof value[Symbol.iterator] === "function") {
+  if (
+    typeof value === "object" &&
+    typeof value[Symbol.iterator] === "function"
+  ) {
     return Array.from(value);
   }
   return [value];
+}
+
+function toObjectValue(value) {
+  const t = typeof value;
+  if (value == null || t === "string" || t === "number" || t === "boolean") {
+    const objValue = {
+      valueOf() {
+        return value;
+      },
+      get $value() {
+        return value;
+      }
+    };
+    if (t === "string") {
+      Object.defineProperty(objValue, "length", {
+        get() {
+          return value.length;
+        }
+      });
+    }
+    return objValue;
+  }
+  return value;
 }
 
 function toNameValuePairs(values) {
@@ -218,13 +245,14 @@ function createIteratorComparator(items, itemType, options) {
       contextPath: `${options.contextPath}[${index}]`,
       estimateProps: true
     };
+    const itemComp = createComparator(
+      item,
+      itemType,
+      itemOptions
+    );
     return {
-      ...item,
-      [options.comparatorNamespace]: createComparator(
-        item,
-        itemType,
-        itemOptions
-      )
+      ...toObjectValue(item),
+      [options.comparatorNamespace]: itemComp,
     };
   });
   comp[Symbol.iterator] = () => {

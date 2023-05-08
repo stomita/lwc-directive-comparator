@@ -111,4 +111,38 @@ describe("c-directive-comparator", () => {
     expect($.type.equals.competitor).toBe(true);
     expect($.limit.lte.maxLimit).toBe(true);
   });
+
+  it("should do iterate with non-object array", () => {
+    const context = {
+      selected: "orange",
+      fruits: ["apple", "orange", "melon", "banana"],
+      num: 1,
+      nums: [0, 1, 2, 3],
+    };
+
+    const $ = comparator(context, {
+      selected: STRING_VALUE,
+      fruits: [STRING_VALUE],
+      num: NUMBER_VALUE,
+      nums: [NUMBER_VALUE],
+    });
+
+    expect($.fruits.length.gt.zero).toBe(true);
+    for (const [index, fruit] of [...$.fruits].entries()) {
+      expect(
+        index === 1
+          ? fruit.$.equals.$selected
+          : fruit.$.not.equals.$selected
+      ).toBe(true);
+      expect(fruit.$value).toBe(context.fruits[index]);
+    }
+    for (const [index, num] of [...$.nums].entries()) {
+      expect(
+        index === 1
+          ? num.$.equals.$num
+          : num.$.not.equals.$num
+      ).toBe(true);
+      expect(num.$value).toBe(context.nums[index]);
+    }
+  });
 });
