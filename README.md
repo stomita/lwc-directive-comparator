@@ -383,67 +383,37 @@ In the iteration loop, the template conditionally displays information by using 
 
 ### Operators
 
-There are pre-defined operators to form comparison directive. Followings are the available 
+There are pre-defined operators to form comparison directive. Followings are the available operators:
 
-##### is / equals
+* **is / equals** - Checks if given two values are exactly equal or not.
 
-Checks if given two values are exactly equal or not.
+* **isNot / notEquals** - Checks if given two values are not exactly equal.
 
-##### isNot / notEquals
+* **gt / greaterThan** - Checks if the comparing property's value is greater than the comparing value.
 
-Checks if given two values are not exactly equal.
+* **gte / greaterThanOrEquals** - Checks if the comparing property's value is greater than or equals to the comparing value.
 
-##### gt / greaterThan
+* **lt / lessThan** - Checks if the comparing property's value is less than the comparing value.
 
-Checks if the comparing property's value is greater than the comparing value.
+* **lte / lessThanOrEquals** - Checks if the comparing property's value is less than or equals to the comparing value.
 
-##### gte / greaterThanOrEquals
+* **startsWith** - Checks if the comparing property's value (string) starts with the comparing string value.
 
-Checks if the comparing property's value is greater than or equals to the comparing value.
+* **endsWith** - Checks if the comparing property's value (string) ends with the comparing string value.
 
-##### lt / lessThan
+* **includes** - Checks if the comparing property's value (string) includes the comparing string value.
 
-Checks if the comparing property's value is less than the comparing value.
+* **isTruthy / isFalsy** - Checks if the comparing property's value is truthy / falsy.
 
-##### lte / lessThanOrEquals
+* **isNull / isNotNull** - Checks if the comparing property's value is null or not null.
 
-Checks if the comparing property's value is less than or equals to the comparing value.
+* **isUndefined / isNotUndefined** - Checks if the comparing property's value is undefined in JavaScript or not.
 
-##### startsWith
+* **isNullish / isNotNullish** - Checks if the comparing property's value is undefined or null in JavaScript.
 
-Checks if the comparing property's value (string) starts with the comparing string value.
+* **isEmpty / isNotEmpty** - Checks if the comparing property's value is undefined, null, empty string, or empty array in JavaScript.
 
-##### endsWith
-
-Checks if the comparing property's value (string) ends with the comparing string value.
-
-##### includes
-
-Checks if the comparing property's value (string) includes the comparing string value.
-
-##### isTruthy / isFalsy
-
-Checks if the comparing property's value is truthy / falsy.
-
-##### isNull / isNotNull
-
-Checks if the comparing property's value is null or not null.
-
-##### isUndefined / isNotUndefined
-
-Checks if the comparing property's value is undefined in JavaScript or not.
-
-##### isNullish / isNotNullish
-
-Checks if the comparing property's value is undefined or null in JavaScript.
-
-##### isEmpty / isNotEmpty
-
-Checks if the comparing property's value is undefined, null, empty string, or empty array in JavaScript.
-
-##### not
-
-Operatior that negates the following comparison result. For example, `$.prop1.not.startsWith.foo` negates the comparison result `prop1` property value and constant `foo` using operator `startsWith`.
+* **not** - Operatior that negates following comparison result. For example, `$.prop1.not.startsWith.foo` negates the comparison result from `prop1` property value and constant `foo` using operator `startsWith`.
 
 ### Constants
 
