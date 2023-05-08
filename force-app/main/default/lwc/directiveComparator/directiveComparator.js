@@ -26,11 +26,11 @@ const BINARY_COMPARISON_OPERATIONS = {
   isNot: (v1, v2) => v1 !== v2,
   greaterThan: (v1, v2) => v1 > v2,
   gt: (v1, v2) => v1 > v2,
-  greaterThanOrEqual: (v1, v2) => v1 >= v2,
+  greaterThanOrEquals: (v1, v2) => v1 >= v2,
   gte: (v1, v2) => v1 >= v2,
   lessThan: (v1, v2) => v1 < v2,
   lt: (v1, v2) => v1 < v2,
-  lessThanOrEqual: (v1, v2) => v1 <= v2,
+  lessThanOrEquals: (v1, v2) => v1 <= v2,
   lte: (v1, v2) => v1 <= v2,
   startsWith: (v1, v2) => typeof v1 === "string" && v1.startsWith(v2),
   endsWith: (v1, v2) => typeof v1 === "string" && v1.endsWith(v2),
@@ -144,7 +144,7 @@ function toArray(value) {
 function toNameValuePairs(values) {
   const nameValuePairs = [];
   for (const val of values) {
-    if (typeof val === "object" && val != null) {
+    if (typeof val === "object" && val != null && !Array.isArray(val)) {
       for (const [name, value] of Object.entries(val)) {
         nameValuePairs.push([name, value]);
       }

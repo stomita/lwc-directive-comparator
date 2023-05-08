@@ -1,4 +1,4 @@
-import { comparator, STRING_VALUE } from "c/directiveComparator";
+import { comparator, STRING_VALUE, NUMBER_VALUE } from "c/directiveComparator";
 
 describe("c-directive-comparator", () => {
   afterEach(() => {});
@@ -48,30 +48,22 @@ describe("c-directive-comparator", () => {
         );
       }
     };
-    const $ = comparator(
-      context,
-      {
-        contactId: STRING_VALUE,
-        keyword: STRING_VALUE,
-        account: {
-          Id: STRING_VALUE
-        },
-        contacts: [
-          {
-            Id: STRING_VALUE,
-            Account: {
-              Id: STRING_VALUE
-            }
-          }
-        ],
-        filteredContacts: []
+    const $ = comparator(context, {
+      contactId: STRING_VALUE,
+      keyword: STRING_VALUE,
+      account: {
+        Id: STRING_VALUE
       },
-      {
-        constants: {
-          three: 3
+      contacts: [
+        {
+          Id: STRING_VALUE,
+          Account: {
+            Id: STRING_VALUE
+          }
         }
-      }
-    );
+      ],
+      filteredContacts: []
+    });
     expect($.contacts.length.gt.zero).toBe(true);
     expect($.filteredContacts.length.gt.zero).toBe(true);
     expect($.account.Name.includes.$keyword).toBe(true);
@@ -87,7 +79,6 @@ describe("c-directive-comparator", () => {
     context.contactId = "cont2";
     context.keyword = "Ad";
     expect($.account.Name.not.includes.$keyword).toBe(true);
-    expect($.keyword.length.lte.three).toBe(true);
     expect($.filteredContacts.isEmpty).toBe(true);
     for (const [index, contact] of [...$.contacts].entries()) {
       expect(
@@ -96,5 +87,28 @@ describe("c-directive-comparator", () => {
           : contact.$.Id.not.equals.$contactId
       ).toBe(true);
     }
+  });
+
+  it("should accept constant definition", () => {
+    const context = {
+      type: "03. Competitor",
+      limit: 100
+    };
+    const $ = comparator(
+      context,
+      {
+        type: [
+          ["customer", "01. Customer"],
+          ["partner", "02. Partner"],
+          ["competitor", "03. Competitor"]
+        ],
+        limit: NUMBER_VALUE
+      },
+      {
+        constants: { maxLimit: 100 }
+      }
+    );
+    expect($.type.equals.competitor).toBe(true);
+    expect($.limit.lte.maxLimit).toBe(true);
   });
 });
