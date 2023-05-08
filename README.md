@@ -510,7 +510,7 @@ export default class MyComponent extends LightningElement {
 If there are constants widely used in the component properties, pass them to `constants` in `options` argument in `comparator` function.
 
 ```javascript
-export default class PersonCompoennt extends LightningElement {
+export default class PersonComponent extends LightningElement {
   name = "Michael Johnson";
   title = "CEO";
 
