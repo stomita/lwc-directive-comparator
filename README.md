@@ -9,6 +9,7 @@ If you have property `rank` and `fullName` in your component, and want to show s
 
 ```html
 <aura:component>
+  <aura:attribute name="rank" type="String" />
   <div>
     <aura:if isTrue="{!v.rank == 'gold'}">
       <span>Hi, {!v.fullName} - special offer to you, click <a href="">here</a>.</span>
@@ -20,7 +21,7 @@ If you have property `rank` and `fullName` in your component, and want to show s
       <span>Welcome, {!v.fullName}</span>
     </aura:if>
   </div>
-</aura>
+</aura:component>
 ```
 
 Unlike Aura component, LWC does not allow the inline expression in template, so comparisons should be written in the script file.
